@@ -1,0 +1,329 @@
+#include <iostream>
+#include <pqxx/pqxx>
+#include <fstream>
+#include "exerciser.h"
+#include <string>
+using namespace std;
+using namespace pqxx;
+
+string insert_player(){
+  ifstream myplayer("player.txt");
+  string to_insert;
+
+  
+  if(myplayer.is_open()){
+    string line;
+    while(getline(myplayer,line)){
+      string player_id, team_id, uniform_num, first_name, last_name, mpg, ppg,
+	rpg,apg,spg,bpg;
+      to_insert += "INSERT INTO player (player_id,team_id,uniform_num,first_name,last_name,mpg,ppg,rpg,apg,spg,bpg)";
+      to_insert = to_insert + " VALUES" + '(';
+      int pos = 0;
+      pos = line.find(' ');
+
+      //store player id
+      player_id = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += player_id+", ";
+
+      //store team_id
+      pos = line.find(' ');
+      team_id = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += team_id + ", ";
+      
+      //store uniform_num
+      pos = line.find(' ');
+      uniform_num = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += uniform_num + ", ";
+      
+      //store first_name
+      pos = line.find(' ');
+      first_name = line.substr(0,pos);
+      line.erase(0,pos+1);
+       if(first_name.find("'") != string::npos){
+     	int to_re = first_name.find("'");
+	string temp = first_name.substr(0, to_re);
+	first_name.erase(0, to_re);
+	first_name = temp + "'" + first_name;
+       }
+      to_insert += "'" + first_name +"'"+ ", ";
+      
+      //store last_name
+      pos = line.find(' ');
+      last_name = line.substr(0,pos);
+      line.erase(0,pos+1);
+      
+      if(last_name.find("'") != string::npos){
+	int to_re = last_name.find("'");
+	string temp = last_name.substr(0, to_re);
+        last_name.erase(0, to_re);
+        last_name = temp + "'"	+ last_name;
+      }
+      to_insert += "'" + last_name+ "'"  + ", ";
+
+      //store mpg
+      pos = line.find(' ');
+      mpg = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += mpg + ", ";
+      
+      //store ppg
+      pos = line.find(' ');
+      ppg = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += ppg + ", ";
+      
+      //store rpg
+      pos = line.find(' ');
+      rpg = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += rpg + ", ";
+     
+      //store apg
+      pos = line.find(' ');
+      apg = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += apg + ", ";
+      
+      //store spg
+      pos = line.find(' ');
+      spg = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += spg + ", ";
+      
+      //store bpg
+      bpg = line;
+      to_insert += bpg + ");";
+      
+
+    }
+  }
+  
+   
+  myplayer.close();
+  return to_insert;
+}
+
+string insert_team(){
+  ifstream myteam("team.txt");
+  string to_insert;
+  if(myteam.is_open()){
+    string line;
+    while(getline(myteam,line)){
+      to_insert += "INSERT INTO team (team_id, name, state_id, color_id, wins, losses)";
+      to_insert = to_insert + " VALUES" + '(';
+      //store team_id
+      int pos = line.find(' ');
+      string team_id = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += team_id + ", ";
+      
+      //store name
+      pos = line.find(' ');
+      string name = line.substr(0,pos);
+      line.erase(0,pos+1);
+      if(name.find("'") != string::npos){
+        int to_re = name.find("'");
+        string temp = name.substr(0, to_re);
+        name.erase(0, to_re);
+        name = temp + "'" + name;
+      }
+
+      to_insert += "'" + name + "'" +", ";
+      
+      //store state_id
+      pos = line.find(' ');
+      string state_id = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += state_id + ", ";
+      
+      //store color_id
+      pos = line.find(' ');
+      string color_id =	line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert	+= color_id + ", ";
+
+      //store wins
+      pos = line.find(' ');
+      string wins = line.substr(0,pos);
+      line.erase(0,pos+1);
+      to_insert += wins + ", ";
+      
+      //store losses
+      string losses = line;
+      to_insert += losses + " );";
+
+      
+    }
+  }
+ 
+  myteam.close();
+  return to_insert;
+}
+
+string insert_state(){
+  ifstream mystate("state.txt");
+  string to_insert;
+  if(mystate.is_open()){
+    string line;
+    while(getline(mystate,line)){
+      to_insert += "INSERT INTO state (state_id, name)";
+      to_insert = to_insert + " VALUES" + '(';
+
+      //store state_id
+      int pos = line.find(' ');
+      string state_id = line.substr (0,pos);
+      line.erase(0,pos+1);
+      to_insert += state_id + ", ";
+
+      //store name
+      string name = line;
+      if(name.find("'") != string::npos){
+        int to_re = name.find("'");
+        string temp = name.substr(0, to_re);
+        name.erase(0, to_re);
+        name = temp + "'" + name;
+      }
+      to_insert +="'"+ name + "'"+" );";
+    }
+  }
+  
+ 
+  
+  mystate.close();
+  return to_insert;
+}
+
+string insert_color(){
+  ifstream mycolor("color.txt");
+  string to_insert;
+  if(mycolor.is_open()){
+    string line;
+    while(getline(mycolor,line)){
+      to_insert += "INSERT INTO color (color_id, name)";
+      to_insert = to_insert + " VALUES" + '(';
+
+      //store color_id
+      int pos = line.find(' ');
+      string color_id = line.substr (0,pos);
+      line.erase(0,pos+1);
+      to_insert += color_id + ", ";
+      //store name
+      string name = line;
+      if(name.find("'") != string::npos){
+        int to_re = name.find("'");
+        string temp = name.substr(0, to_re);
+        name.erase(0, to_re);
+        name = temp + "'" + name;
+      }
+      to_insert +="'"+ name + "'"+" );";
+	
+    }
+  }
+  
+  mycolor.close();
+  return to_insert;
+}
+
+int main (int argc, char *argv[]) 
+{
+
+  //Allocate & initialize a Postgres connection object
+  connection *C;
+  //  work W(*C);
+
+  try{
+    //Establish a connection to the database
+    //Parameters: database name, user name, user password
+    C = new connection("dbname=ACC_BBALL user=postgres password=passw0rd hostaddr = 127.0.0.1 port = 5432");
+    if (C->is_open()) {
+      //      cout << "Opened database successfully: " << C->dbname() << endl;
+    } else {
+      cout << "Can't open database" << endl;
+      return 1;
+    }
+
+   
+  } catch (const std::exception &e){
+    cerr << e.what() << std::endl;
+    return 1;
+  }
+
+
+  //TODO: create PLAYER, TEAM, STATE, and COLOR tables in the ACC_BBALL database
+  //      load each table with rows from the provided source txt files
+
+   //create table state                                                                                                                                
+  const char * state;
+  state = "CREATE TABLE STATE("         \
+    "STATE_ID INT PRIMARY KEY NOT NULL,"                     \
+    "NAME TEXT NOT NULL);";
+
+  //create table color                                                                                                                                
+  const char * color;
+  color = "CREATE TABLE COLOR("         \
+    "COLOR_ID INT PRIMARY KEY NOT NULL,"                     \
+    "NAME TEXT NOT NULL);";
+
+  //create table PLAYER                                                                          
+
+  const char * player;
+  player = "CREATE TABLE PLAYER("		
+    "PLAYER_ID INT PRIMARY KEY NOT NULL,"\
+    "TEAM_ID INT REFERENCES TEAM(TEAM_ID),"			
+    "UNIFORM_NUM INT NOT NULL,"		\
+    "FIRST_NAME TEXT NOT NULL,"	\
+    "LAST_NAME TEXT NOT NULL,"	\
+    "MPG INT NOT NULL,"			\
+    "PPG INT NOT NULL,"			
+    "RPG INT NOT NULL,"			
+    "APG INT NOT NULL,"			
+    "SPG REAL NOT NULL,"			
+    "BPG REAL NOT NULL);";
+  const char * team;
+  team = "CREATE TABLE TEAM("			\
+    "TEAM_ID INT PRIMARY KEY,"		\
+    "NAME TEXT NOT NULL,"		\
+    "STATE_ID INT REFERENCES state(state_id),"			\
+    "COLOR_ID INT REFERENCES color(color_id),"			\
+    "WINS INT NOT NULL,"			\
+    "LOSSES INT NOT NULL);";
+
+  
+  work W(*C);
+  //execute SQL query
+
+  //drop tables that may already exist
+  W.exec("DROP TABLE IF EXISTS state CASCADE;");
+  W.exec("DROP TABLE IF EXISTS color CASCADE;");
+  W.exec("DROP TABLE IF EXISTS player CASCADE;");
+  W.exec("DROP TABLE IF EXISTS team CASCADE;");
+
+  W.exec(state);
+  string insert_s = insert_state();
+  W.exec(insert_s);
+
+  W.exec(color);
+  string insert_c = insert_color();
+  W.exec(insert_c);
+
+  W.exec(team);
+  string insert_t = insert_team();
+  W.exec(insert_t);
+
+  W.exec(player);
+  string insert_p = insert_player();
+  W.exec(insert_p);
+
+
+  W.commit();
+  exercise(C);
+  
+  C->disconnect();
+
+  return 0;
+}
+
+
